@@ -1,0 +1,384 @@
+{
+  "name": "scrape",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://n8n_browserless:3000/performance",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "01b27f141e9119d83cb3dde31ff4385c"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"url\": \"https://jonathandacruz.com.br/\",\n  \"config\": {\n    \"extends\": \"lighthouse:default\",\n    \"settings\": {\n      \"onlyCategories\": [\"performance\"]\n    }\n  }\n}",
+        "options": {}
+      },
+      "id": "fb55ba7f-6ede-4ed0-b1ee-0c7d5829df8d",
+      "name": "Performance Site",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1400,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (const item of $input.all()) {\n  const results = item.json.data[0].results;\n\n  for (const result of results) {\n    const attrs = result.attributes;\n\n    if (Array.isArray(attrs) && attrs.length > 1) {\n      output.push({\n        json: {\n          name: attrs[1].name,\n          value: attrs[1].value\n        }\n      });\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        -40
+      ],
+      "id": "6ad2999a-88b1-4112-975c-67048ac044de",
+      "name": "Code"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1420,
+        -40
+      ],
+      "id": "60c1f75f-beff-4d43-8feb-14a6722c1305",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e931e72d-5d3a-497f-82c9-55b0bfc08f2a",
+              "leftValue": "={{ $json.value }}",
+              "rightValue": "ebook",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -360,
+        -40
+      ],
+      "id": "9ce7e07b-a75c-4432-9908-a97bc10f22d7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        -40
+      ],
+      "id": "90d47389-2444-4795-95c4-0e70aa1298c5",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://n8n_browserless:3000/scrape",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "01b27f141e9119d83cb3dde31ff4385c"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"url\": \"https://jonathandacruz.com.br/\",\n  \"elements\": [\n    { \"selector\": \"a\" }\n  ],\n  \"waitForTimeout\": 1000\n}",
+        "options": {}
+      },
+      "id": "fcc35096-318f-451b-a52f-f473efec9756",
+      "name": "raspando",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1100,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://n8n_browserless:3000/scrape",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "01b27f141e9119d83cb3dde31ff4385c"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"https://jonathandacruz.com.br/{{ $json.value }}\",\n  \"elements\": [\n    { \"selector\": \"a\" }\n  ],\n  \"waitForTimeout\": 1000\n} ",
+        "options": {}
+      },
+      "id": "72bcfe92-64da-4aa3-b2ab-e0fa88d9769d",
+      "name": "raspandoEbook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -40,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (const item of $input.all()) {\n  const results = $input.first().json.data[0].results;\n\n  for (const result of results) {\n    const attrs = result.attributes;\n\n    if (Array.isArray(attrs)) {\n      for (const attr of attrs) {\n        if (attr.name === \"href\") {\n          output.push({\n            json: {\n              name: attr.name,\n              value: attr.value\n            }\n          });\n        }\n      }\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        -200
+      ],
+      "id": "164a7211-7b00-4f7c-a0e5-250f2fc24e89",
+      "name": "getHref"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -200
+      ],
+      "id": "6ac0c36c-5af2-41bc-a814-81679952118d",
+      "name": "Remove Duplicates1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9e8cdda9-7f2d-4fc0-b0a9-12d38f13e2c7",
+              "leftValue": "={{ $json.value }}",
+              "rightValue": "hotmart",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        -200
+      ],
+      "id": "9e5d6cee-d1ed-4b33-ac3b-d92cfc89ab82",
+      "name": "existeHotmart"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://n8n_browserless:3000/function",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "01b27f141e9119d83cb3dde31ff4385c"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/javascript",
+        "body": "=export default async function ({ page }) {    await page.setExtraHTTPHeaders({ \"Accept-Language\": \"pt-BR\" });    await page.goto(\"{{ $json.value }}\" , { waitUntil: \"networkidle2\" });    await page.waitForSelector(\"[data-testid=\\x27product-price\\x27]\", { timeout: 10000 });    const price = await page.$eval(\"[data-testid=\\x27product-price\\x27]\", el => el.textContent.trim());    return {      data: price,      type: \"text/plain\"    };  } ",
+        "options": {}
+      },
+      "id": "e17db080-6abd-4509-ae75-9e7583ce1b7e",
+      "name": "buscaValor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://n8n_browserless:3000/function",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "01b27f141e9119d83cb3dde31ff4385c"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/javascript",
+        "body": "export default async function ({ page }) {\n    await page.goto('https://the-internet.herokuapp.com/login', { waitUntil: 'networkidle2' }); await page.type('#username', 'tomsmih'); await page.type('#password', 'SuperSecretPassword!'); await page.click('button[type=\"submit\"]'); await page.waitForSelector('#flash');    // Extrair o texto da mensagem flash (opcional)  \n    const message = await page.$eval('#flash', el => el.textContent.trim());\n    // Agora pega TODO o conteúdo da div.content após login   \n    await page.waitForSelector('div#content');\n    const content = await page.$eval('div#content', el => el.innerText.trim());\n    return { data: { message, content }, type: 'application/json', };\n}",
+        "options": {}
+      },
+      "id": "25c635e6-ac52-46c7-aadc-b691db1d8efb",
+      "name": "fazendoLogin",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1440,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "raspando",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "raspando": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "raspandoEbook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "raspandoEbook": {
+      "main": [
+        [
+          {
+            "node": "getHref",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getHref": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates1": {
+      "main": [
+        [
+          {
+            "node": "existeHotmart",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "existeHotmart": {
+      "main": [
+        [
+          {
+            "node": "buscaValor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f9aef031-0fbd-4368-a1dc-7ae2dd59abb7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fc150a6636032594aef5b74ae4f6056dcb1e472aacb2c03ad05ff33f2eb7546"
+  },
+  "id": "PrvAZfablIJOPJFw",
+  "tags": []
+}
