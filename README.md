@@ -8,6 +8,8 @@
 
 > Automatize a extração de links e preços com Puppeteer sem instalar nada localmente, usando n8n + Browserless.
 
+🎥 **Canal no YouTube:** [youtube.com/@jonathandacruz](https://www.youtube.com/@jonathandacruz)
+
 ---
 
 ## 📦 Requisitos
