@@ -1,3 +1,4 @@
+
 # 🕷️ Web Scraper com n8n + Browserless + Puppeteer
 
 [![n8n](https://img.shields.io/badge/n8n-automated-orange?style=flat&logo=n8n)](https://n8n.io)
@@ -43,30 +44,41 @@ services:
       - DEFAULT_LAUNCH_ARGS=["--no-sandbox"]
       - CONNECTION_TIMEOUT=60000
     restart: unless-stopped
-🧠 O que o fluxo scrape.json faz?
+```
 
-🔹 Visão geral do processo:
-Inicia com gatilho manual
-Usa Browserless para acessar https://jonathandacruz.com.br/
-Extrai todos os elementos <a>
-Remove duplicatas e filtra apenas links que contêm “ebook”
-Raspa os links de cada página encontrada
-Verifica se há links que levam ao Hotmart
-Se houver, chama o endpoint /function da Browserless para extrair o preço
-Exemplo extra: faz login automático em uma página de teste (Herokuapp)
-🗂️ Estrutura dos principais nós
+---
 
-Etapa	Função
-raspando	Raspa os links da página inicial usando o endpoint /scrape
-Code + Remove Duplicates	Filtra e extrai os atributos úteis dos links <a>
-If	Verifica se os links contêm a palavra ebook
-raspandoEbook	Roda novo scraping nos links encontrados
-getHref	Extrai href dos elementos <a>
-existeHotmart	Verifica se o link aponta para um domínio hotmart.com
-buscaValor	Usa Puppeteer via /function para extrair o data-testid="product-price"
-fazendoLogin	Demonstra como automatizar login com Puppeteer
-🔍 Exemplo de uso do endpoint /function
+## 🔹 Visão geral do processo
 
+1. Inicia com **gatilho manual**
+2. Usa **Browserless** para acessar: `https://jonathandacruz.com.br/`
+3. Extrai todos os elementos `<a>`
+4. Remove duplicatas e filtra apenas links que **contêm “ebook”**
+5. Raspa os links de cada página encontrada
+6. Verifica se há links que levam ao **Hotmart**
+7. Se houver, chama o endpoint `/function` da Browserless para **extrair o preço**
+8. Exemplo extra: faz **login automático** em uma página de teste (Herokuapp)
+
+---
+
+## 🗂️ Estrutura dos principais nós
+
+| Etapa                 | Função                                                                 |
+|-----------------------|------------------------------------------------------------------------|
+| `raspando`            | Raspa os links da página inicial usando o endpoint `/scrape`           |
+| `Code + Remove Duplicates` | Filtra e extrai os atributos úteis dos links `<a>`                      |
+| `If`                  | Verifica se os links contêm a palavra `ebook`                          |
+| `raspandoEbook`       | Roda novo scraping nos links encontrados                               |
+| `getHref`             | Extrai `href` dos elementos `<a>`                                      |
+| `existeHotmart`       | Verifica se o link aponta para um domínio `hotmart.com`                |
+| `buscaValor`          | Usa Puppeteer via `/function` para extrair o `data-testid="product-price"` |
+| `fazendoLogin`        | Demonstra como automatizar login com Puppeteer                         |
+
+---
+
+## 🔍 Exemplo de uso do endpoint `/function`
+
+```js
 export default async function ({ page }) {
   await page.setExtraHTTPHeaders({ "Accept-Language": "pt-BR" });
   await page.goto("https://pay.hotmart.com/S11941831Y", { waitUntil: "networkidle2" });
@@ -77,23 +89,35 @@ export default async function ({ page }) {
     type: "text/plain"
   };
 }
-🧪 Como importar o fluxo no n8n
+```
 
-Acesse seu n8n: http://localhost:5678
-Vá em “Workflows” > “Import”
-Selecione o arquivo scrape.json
-Atualize os tokens e URLs se necessário
-Clique em "Execute workflow"
-🔐 Segurança e Boas práticas
+---
 
-NUNCA exponha o token da Browserless em repositórios públicos
-Respeite o robots.txt e os termos de uso das páginas que estiver raspando
-Use delays e limite o número de requisições em produção
-Configure variáveis de ambiente no n8n em vez de colocar valores diretamente nos nós
-👨‍💻 Autor
+## 🧪 Como importar o fluxo no n8n
 
-Feito com ❤️ por Jonathan da Cruz
+1. Acesse seu n8n: [http://localhost:5678](http://localhost:5678)
+2. Vá em **“Workflows” > “Import”**
+3. Selecione o arquivo `scrape.json`
+4. Atualize os tokens e URLs se necessário
+5. Clique em **"Execute workflow"**
 
-📃 Licença
+---
 
-Distribuído sob a licença MIT. Veja LICENSE para mais detalhes.
+## 🔐 Segurança e Boas práticas
+
+- **NUNCA** exponha o token da Browserless em repositórios públicos
+- Respeite o `robots.txt` e os termos de uso das páginas que estiver raspando
+- Use delays e limite o número de requisições em produção
+- Configure variáveis de ambiente no n8n em vez de colocar valores diretamente nos nós
+
+---
+
+## 👨‍💻 Autor
+
+Feito com ❤️ por [Jonathan da Cruz]([https://jonathandacruz.com.br](https://www.youtube.com/@jonathandacruz))
+
+---
+
+## 📃 Licença
+
+Distribuído sob a licença **MIT**. Veja o arquivo `LICENSE` para mais detalhes.
